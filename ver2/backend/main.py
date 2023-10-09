@@ -36,24 +36,32 @@ app.add_middleware(
 )
 
 
-# API Endpoints ==============================
+# ============================== API Endpoints ==============================
+
 @app.get("/health")
 async def check_health():
     print("backend is healthy!")
     return {"message": "healthy"}
+
 
 @app.get("/reset")
 async def reset_conversation():
     reset_messages()
     return {"message": "conversation reset"}
 
-# use @get for testing, use @post later
-@app.get("/post-audio-get")
-async def get_audio():
 
-    # Get saved audio
-    audio_input = open("test-bmo1.mp3", "rb")
-    print(audio_input)
+@app.post("/post-audio")
+async def post_audio(file: UploadFile = File(...)):
+    # Note: Not playing in browser when using post request --> Play in React Application
+
+    # # Get hardcoded test audio
+    # audio_input = open("test-bmo1.mp3", "rb")
+    # print(audio_input)
+
+    # Save file from front end
+    with open(file.filename, "wb") as buffer:
+        buffer.write(file.file.read())
+    audio_input = open(file.filename, "rb")
 
     # Decode Audio + Guard
     message_decoded = convert_audio_to_text(audio_input)
@@ -80,13 +88,5 @@ async def get_audio():
         yield audio_output
 
     # Return audio file
-    return StreamingResponse(iterfile(), media_type="audio/mpeg")
-
-# # Post bot response
-# # Note: Not playing in browser when using post request --> Play in React Application
-# @app.post("/post-audio")
-# async def post_audio(file: UploadFile = File(...)):
-
-#     # write logic in get function
-
-#     print("Test")
+    # media_type="audio/mpeg"
+    return StreamingResponse(iterfile(), media_type="application/octet-stream")
