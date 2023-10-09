@@ -11,7 +11,8 @@ uvicorn main:app --reload
 ```
 note: dont use the `--reload` in production environments
 
-### Setup
+## Setup 
+### Backend
 ```
 python3 -m venv venv 
 ```
@@ -26,4 +27,37 @@ Install this manually:
 ```
 pip3 install -r requirements.txt  
 pip3 install "uvicorn[standard]" 
+```
+
+#### Run
+```
+uvicorn main:app --reload
+```
+
+### Frontend
+```
+sudo npm install --global yarn --force
+```
+```
+npm install -g create-vite
+npm install -D tailwindcss postcss autoprefixer
+yarn install
+```
+Start the project
+```
+yarn create vite . 
+```
+
+make sure that you have set a `.nvmrc` file to `16` and run 
+```
+nvm use 16
+or 
+nvm use
+```
+
+#### Run
+```
+yarn dev    # for dev environment
+yarn build  # check code syntax
+yarn start  # run code to site
 ```
