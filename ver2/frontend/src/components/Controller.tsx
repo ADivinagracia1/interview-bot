@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Title from "./Title";
 import RecordMessage from "./RecordMessage";
 import axios from "axios";
@@ -7,7 +7,7 @@ function Controller() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
 
-  const eleven_labs_voice = "elli"
+  const eleven_labs_voice = "elli";
 
   // Blobs are the way that ReactMediaController stores audio files
   // they can be shown by <audio></audio> as a playback gui
@@ -48,20 +48,21 @@ function Controller() {
             audio.src = createBlobURL(blob);
 
             // Append to Audio
-            const robotMessage = {sender: eleven_labs_voice, blobURL: audio.src};
+            const robotMessage = {
+              sender: eleven_labs_voice,
+              blobURL: audio.src,
+            };
             messagesArr.push(robotMessage);
             setMessages(messagesArr);
-          
+
             // Play Audio
             setIsLoading(false);
             audio.play();
-
-        })
-          .catch((err) => {
-            console.error(err)
-            setIsLoading(false)
           })
-
+          .catch((err) => {
+            console.error(err);
+            setIsLoading(false);
+          });
       });
 
     setIsLoading(false);
@@ -71,6 +72,56 @@ function Controller() {
     <div className="h-screen overflow-y-hidden">
       <Title setMessages={setMessages}></Title>
       <div className="flex flex-col justify-between h-full overflow-y-scroll pb-96">
+        {/* Conversation */}
+        <div className="mt-5 px-5">
+          {messages.map((audio, index) => {
+            return (
+              <div
+                key={index + audio.sender}
+                className={
+                  "flex flex-col " +
+                  (audio.sender == eleven_labs_voice && "flex items-end")
+                }
+              >
+                {/* Sender */}
+                <div className="mt-4">
+                  <p
+                    className={
+                      audio.sender == eleven_labs_voice
+                        ? "text-right mr-2 italic text-green-500"
+                        : "ml-2 italic text-blue-500"
+                    }
+                  >
+                    {audio.sender}
+                  </p>
+
+                  {/* Audio Message */}
+                  {/* Edit: instead of showing the audio file, show the message that was said instead */}
+                  <audio
+                    src={audio.blobURL}
+                    className="appearance-none"
+                    controls
+                  />
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Empty message screen */}
+          {messages.length == 0 && !isLoading && (
+            <div className="text-center font-light italic mt-10">
+                Record me a message
+            </div>
+          )}
+
+          {/* Processing resposne */}
+          {isLoading && (
+            <div className="text-center font-light italic mt-10 animate-pulse">
+                Processing response...
+            </div>
+          )}
+        </div>
+
         {/* Recorder */}
         <div className="fixed bottom-0 w-full border-t text-center py-6 bg-gradient-to-r from-sky-500 to-green-500">
           <div className="flex justify-center items-center w-full">
