@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import Title from "./Title";
 import RecordMessage from "./RecordMessage";
+import axios from "axios";
 
 function Controller() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
+
+  const eleven_labs_voice = "elli"
 
   // Blobs are the way that ReactMediaController stores audio files
   // they can be shown by <audio></audio> as a playback gui
@@ -25,14 +28,39 @@ function Controller() {
     const messagesArr = [...messages, myMessage];
 
     // Convert blob url to blot object
-    //      
+    //
     fetch(blobURL)
       .then((res) => res.blob())
       .then(async (blob) => {
-
         // Construct audio to send file
         const formData = new FormData();
-        formData.append("file", blob, "myFile.wav")
+        formData.append("file", blob, "myFile.wav");
+
+        // Send form data to API endpoint
+        await axios
+          .post("http://localhost:8000/post-audio", formData, {
+            headers: { "Content-Type": "audio/mpeg" },
+            responseType: "arraybuffer",
+          })
+          .then((res: any) => {
+            const blob = res.data;
+            const audio = new Audio();
+            audio.src = createBlobURL(blob);
+
+            // Append to Audio
+            const robotMessage = {sender: eleven_labs_voice, blobURL: audio.src};
+            messagesArr.push(robotMessage);
+            setMessages(messagesArr);
+          
+            // Play Audio
+            setIsLoading(false);
+            audio.play();
+
+        })
+          .catch((err) => {
+            console.error(err)
+            setIsLoading(false)
+          })
 
       });
 
