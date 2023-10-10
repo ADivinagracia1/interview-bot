@@ -4,9 +4,9 @@ import Controller from "./components/Controller"
 function App() {
 
   return (
-    <>
-      <Controller/>
-    </>
+    <div className="">
+      <Controller></Controller>
+    </div>
   )
 }
 
